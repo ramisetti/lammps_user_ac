@@ -1,4 +1,4 @@
-/* -*- c++ -*- ----------------------------------------------------------
+/* ----------------------------------------------------------------------
    LAMMPS - Large-scale Atomic/Molecular Massively Parallel Simulator
    http://lammps.sandia.gov, Sandia National Laboratories
    Steve Plimpton, sjplimp@sandia.gov
@@ -13,7 +13,7 @@
 
 #ifdef FIX_CLASS
 
-FixStyle(ave/chunk/ac,FixAveChunkAC)
+FixStyle(ave/chunk,FixAveChunkAC)
 
 #else
 
