@@ -13,22 +13,22 @@
 
 #ifdef FIX_CLASS
 
-FixStyle(ave/time,FixAveTimeAC)
+FixStyle(ave/time,FixAveTime)
 
 #else
 
-#ifndef LMP_FIX_AVE_TIME_AC_H
-#define LMP_FIX_AVE_TIME_AC_H
+#ifndef LMP_FIX_AVE_TIME_H
+#define LMP_FIX_AVE_TIME_H
 
 #include <stdio.h>
 #include "fix.h"
 
 namespace LAMMPS_NS {
 
-class FixAveTimeAC : public Fix {
+class FixAveTime : public Fix {
  public:
-  FixAveTimeAC(class LAMMPS *, int, char **);
-  ~FixAveTimeAC();
+  FixAveTime(class LAMMPS *, int, char **);
+  ~FixAveTime();
   int setmask();
   void init();
   void setup(int);
@@ -87,84 +87,84 @@ Self-explanatory.  Check the input script syntax and compare to the
 documentation for the command.  You can use -echo screen as a
 command-line option when running LAMMPS to see the offending line.
 
-E: No values in fix ave/time/ac command
+E: No values in fix ave/time command
 
 Self-explanatory.
 
-E: Compute ID for fix ave/time/ac does not exist
+E: Compute ID for fix ave/time does not exist
 
 Self-explanatory.
 
-E: Fix ID for fix ave/time/ac does not exist
+E: Fix ID for fix ave/time does not exist
 
 Self-explanatory.
 
-E: Invalid fix ave/time/ac off column
+E: Invalid fix ave/time off column
 
 Self-explanatory.
 
-E: Fix ave/time/ac compute does not calculate a scalar
+E: Fix ave/time compute does not calculate a scalar
 
 Self-explanatory.
 
-E: Fix ave/time/ac compute does not calculate a vector
+E: Fix ave/time compute does not calculate a vector
 
 Self-explanatory.
 
-E: Fix ave/time/ac compute vector is accessed out-of-range
+E: Fix ave/time compute vector is accessed out-of-range
 
 The index for the vector is out of bounds.
 
-E: Fix ave/time/ac compute does not calculate an array
+E: Fix ave/time compute does not calculate an array
 
 Self-explanatory.
 
-E: Fix ave/time/ac compute array is accessed out-of-range
+E: Fix ave/time compute array is accessed out-of-range
 
 An index for the array is out of bounds.
 
-E: Fix ave/time/ac fix does not calculate a scalar
+E: Fix ave/time fix does not calculate a scalar
 
 Self-explanatory.
 
-E: Fix ave/time/ac fix does not calculate a vector
+E: Fix ave/time fix does not calculate a vector
 
 Self-explanatory.
 
-E: Fix ave/time/ac fix vector cannot be variable length
+E: Fix ave/time fix vector cannot be variable length
 
 Self-explanatory.
 
-E: Fix ave/time/ac fix vector is accessed out-of-range
+E: Fix ave/time fix vector is accessed out-of-range
 
 The index for the vector is out of bounds.
 
-E: Fix for fix ave/time/ac not computed at compatible time
+E: Fix for fix ave/time not computed at compatible time
 
-Fixes generate their values on specific timesteps.  Fix ave/time/ac
+Fixes generate their values on specific timesteps.  Fix ave/time
 is requesting a value on a non-allowed timestep.
 
-E: Fix ave/time/ac fix does not calculate an array
+E: Fix ave/time fix does not calculate an array
 
 Self-explanatory.
 
-E: Fix ave/time/ac fix array cannot be variable length
+E: Fix ave/time fix array cannot be variable length
 
 Self-explanatory.
 
-E: Fix ave/time/ac fix array is accessed out-of-range
+E: Fix ave/time fix array is accessed out-of-range
 
 An index for the array is out of bounds.
 
-E: Variable name for fix ave/time/ac does not exist
+E: Variable name for fix ave/time does not exist
 
 Self-explanatory.
 
-E: Fix ave/time/ac variable is not equal-style variable
+E: Fix ave/time variable is not equal-style variable
 
 Self-explanatory.
 
-E: Fix ave/time/ac cannot use variable with vector mode
+E: Fix ave/time cannot use variable with vector mode
 
 Variables produce scalar values.
 
@@ -172,13 +172,13 @@ E: Error writing file header
 
 Something in the output to the file triggered an error.
 
-E: Fix ave/time/ac cannot set output array intensive/extensive from these inputs
+E: Fix ave/time cannot set output array intensive/extensive from these inputs
 
 One of more of the vector inputs has individual elements which are
 flagged as intensive or extensive.  Such an input cannot be flagged as
-all intensive/extensive when turned into an array by fix ave/time/ac.
+all intensive/extensive when turned into an array by fix ave/time.
 
-E: Invalid timestep reset for fix ave/time/ac
+E: Invalid timestep reset for fix ave/time
 
 Resetting the timestep has invalidated the sequence of timesteps this
 fix needs to process.
@@ -187,11 +187,11 @@ E: Error writing out time averaged data
 
 Something in the output to the file triggered an error.
 
-E: Fix ave/time/ac columns are inconsistent lengths
+E: Fix ave/time columns are inconsistent lengths
 
 Self-explanatory.
 
-E: Cannot open fix ave/time/ac file %s
+E: Cannot open fix ave/time file %s
 
 The specified file cannot be opened.  Check that the path and name are
 correct.
