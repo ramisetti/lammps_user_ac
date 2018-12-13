@@ -13,7 +13,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "fix_momentum_new.h"
+#include "fix_momentum_ac.h"
 #include "atom.h"
 #include "domain.h"
 #include "group.h"
