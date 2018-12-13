@@ -40,7 +40,7 @@ enum{ONE,RUNNING,WINDOW};
 
 /* ---------------------------------------------------------------------- */
 
-FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
+FixAveChunk::FixAveChunk(LAMMPS *lmp, int narg, char **arg) :
   Fix(lmp, narg, arg),
   nvalues(0), nrepeat(0),
   which(NULL), argindex(NULL), value2index(NULL), ids(NULL),
@@ -50,7 +50,7 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
   count_total(NULL), count_list(NULL),
   values_total(NULL), values_list(NULL)
 {
-  if (narg < 7) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+  if (narg < 7) error->all(FLERR,"Illegal fix ave/chunk command");
 
   MPI_Comm_rank(world,&me);
 
@@ -136,7 +136,7 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
       char *ptr = strchr(suffix,'[');
       if (ptr) {
         if (suffix[strlen(suffix)-1] != ']')
-          error->all(FLERR,"Illegal fix ave/chunk/ac command");
+          error->all(FLERR,"Illegal fix ave/chunk command");
         argindex[nvalues] = atoi(ptr+1);
         *ptr = '\0';
       } else argindex[nvalues] = 0;
@@ -152,7 +152,7 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
     iarg++;
   }
 
-  if (nvalues == 0) error->all(FLERR,"No values in fix ave/chunk/ac command");
+  if (nvalues == 0) error->all(FLERR,"No values in fix ave/chunk command");
 
   // optional args
 
@@ -173,7 +173,7 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
 
   while (iarg < nargnew) {
     if (strcmp(arg[iarg],"norm") == 0) {
-      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk command");
       if (strcmp(arg[iarg+1],"all") == 0) {
 	normflag = ALL;
 	scaleflag = ATOM;
@@ -183,25 +183,25 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
       } else if (strcmp(arg[iarg+1],"none") == 0) {
 	normflag = SAMPLE;
 	scaleflag = NOSCALE;
-      } else error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      } else error->all(FLERR,"Illegal fix ave/chunk command");
       iarg += 2;
     } else if (strcmp(arg[iarg],"ave") == 0) {
-      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk command");
       if (strcmp(arg[iarg+1],"one") == 0) ave = ONE;
       else if (strcmp(arg[iarg+1],"running") == 0) ave = RUNNING;
       else if (strcmp(arg[iarg+1],"window") == 0) ave = WINDOW;
-      else error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      else error->all(FLERR,"Illegal fix ave/chunk command");
       if (ave == WINDOW) {
-        if (iarg+3 > narg) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+        if (iarg+3 > narg) error->all(FLERR,"Illegal fix ave/chunk command");
         nwindow = force->inumeric(FLERR,arg[iarg+2]);
-        if (nwindow <= 0) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+        if (nwindow <= 0) error->all(FLERR,"Illegal fix ave/chunk command");
       }
       iarg += 2;
       if (ave == WINDOW) iarg++;
 
     } else if (strcmp(arg[iarg],"bias") == 0) {
       if (iarg+2 > narg)
-        error->all(FLERR,"Illegal fix ave/chunk/ac command");
+        error->all(FLERR,"Illegal fix ave/chunk command");
       biasflag = 1;
       int n = strlen(arg[iarg+1]) + 1;
       id_bias = new char[n];
@@ -209,23 +209,23 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
       iarg += 2;
     } else if (strcmp(arg[iarg],"adof") == 0) {
       if (iarg+2 > narg)
-        error->all(FLERR,"Illegal fix ave/chunk/ac command");
+        error->all(FLERR,"Illegal fix ave/chunk command");
       adof = force->numeric(FLERR,arg[iarg+1]);
       iarg += 2;
     } else if (strcmp(arg[iarg],"cdof") == 0) {
       if (iarg+2 > narg)
-        error->all(FLERR,"Illegal fix ave/chunk/ac command");
+        error->all(FLERR,"Illegal fix ave/chunk command");
       cdof = force->numeric(FLERR,arg[iarg+1]);
       iarg += 2;
 
     } else if (strcmp(arg[iarg],"file") == 0) {
-      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk command");
       if (me == 0) {
 	if( access( arg[iarg+1], F_OK ) != -1 ) append=1;
         fp = fopen(arg[iarg+1],"a");
         if (fp == NULL) {
           char str[128];
-          sprintf(str,"Cannot open fix ave/chunk/ac file %s",arg[iarg+1]);
+          sprintf(str,"Cannot open fix ave/chunk file %s",arg[iarg+1]);
           error->one(FLERR,str);
         }
       }
@@ -234,7 +234,7 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
       overwrite = 1;
       iarg += 1;
     } else if (strcmp(arg[iarg],"format") == 0) {
-      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk command");
       delete [] format_user;
       int n = strlen(arg[iarg+1]) + 2;
       format_user = new char[n];
@@ -242,37 +242,37 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
       format = format_user;
       iarg += 2;
     } else if (strcmp(arg[iarg],"title1") == 0) {
-      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk command");
       delete [] title1;
       int n = strlen(arg[iarg+1]) + 1;
       title1 = new char[n];
       strcpy(title1,arg[iarg+1]);
       iarg += 2;
     } else if (strcmp(arg[iarg],"title2") == 0) {
-      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk command");
       delete [] title2;
       int n = strlen(arg[iarg+1]) + 1;
       title2 = new char[n];
       strcpy(title2,arg[iarg+1]);
       iarg += 2;
     } else if (strcmp(arg[iarg],"title3") == 0) {
-      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk/ac command");
+      if (iarg+2 > narg) error->all(FLERR,"Illegal fix ave/chunk command");
       delete [] title3;
       int n = strlen(arg[iarg+1]) + 1;
       title3 = new char[n];
       strcpy(title3,arg[iarg+1]);
       iarg += 2;
-    } else error->all(FLERR,"Illegal fix ave/chunk/ac command");
+    } else error->all(FLERR,"Illegal fix ave/chunk command");
   }
 
   // setup and error check
 
   if (nevery <= 0 || nrepeat <= 0 || nfreq <= 0)
-    error->all(FLERR,"Illegal fix ave/chunk/ac command");
+    error->all(FLERR,"Illegal fix ave/chunk command");
   if (nfreq % nevery || nrepeat*nevery > nfreq)
-    error->all(FLERR,"Illegal fix ave/chunk/ac command");
+    error->all(FLERR,"Illegal fix ave/chunk command");
   if (ave != RUNNING && overwrite)
-    error->all(FLERR,"Illegal fix ave/chunk/ac command");
+    error->all(FLERR,"Illegal fix ave/chunk command");
 
   if (biasflag) {
     int i = modify->find_compute(id_bias);
@@ -289,43 +289,43 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
     if (which[i] == COMPUTE) {
       int icompute = modify->find_compute(ids[i]);
       if (icompute < 0)
-        error->all(FLERR,"Compute ID for fix ave/chunk/ac does not exist");
+        error->all(FLERR,"Compute ID for fix ave/chunk does not exist");
       if (modify->compute[icompute]->peratom_flag == 0)
-        error->all(FLERR,"Fix ave/chunk/ac compute does not "
+        error->all(FLERR,"Fix ave/chunk compute does not "
                    "calculate per-atom values");
       if (argindex[i] == 0 &&
           modify->compute[icompute]->size_peratom_cols != 0)
-        error->all(FLERR,"Fix ave/chunk/ac compute does not "
+        error->all(FLERR,"Fix ave/chunk compute does not "
                    "calculate a per-atom vector");
       if (argindex[i] && modify->compute[icompute]->size_peratom_cols == 0)
-        error->all(FLERR,"Fix ave/chunk/ac compute does not "
+        error->all(FLERR,"Fix ave/chunk compute does not "
                    "calculate a per-atom array");
       if (argindex[i] &&
           argindex[i] > modify->compute[icompute]->size_peratom_cols)
         error->all(FLERR,
-                   "Fix ave/chunk/ac compute vector is accessed out-of-range");
+                   "Fix ave/chunk compute vector is accessed out-of-range");
 
     } else if (which[i] == FIX) {
       int ifix = modify->find_fix(ids[i]);
       if (ifix < 0)
-        error->all(FLERR,"Fix ID for fix ave/chunk/ac does not exist");
+        error->all(FLERR,"Fix ID for fix ave/chunk does not exist");
       if (modify->fix[ifix]->peratom_flag == 0)
         error->all(FLERR,
-                   "Fix ave/chunk/ac fix does not calculate per-atom values");
+                   "Fix ave/chunk fix does not calculate per-atom values");
       if (argindex[i] == 0 && modify->fix[ifix]->size_peratom_cols != 0)
         error->all(FLERR,
-                   "Fix ave/chunk/ac fix does not calculate a per-atom vector");
+                   "Fix ave/chunk fix does not calculate a per-atom vector");
       if (argindex[i] && modify->fix[ifix]->size_peratom_cols == 0)
         error->all(FLERR,
-                   "Fix ave/chunk/ac fix does not calculate a per-atom array");
+                   "Fix ave/chunk fix does not calculate a per-atom array");
       if (argindex[i] && argindex[i] > modify->fix[ifix]->size_peratom_cols)
-        error->all(FLERR,"Fix ave/chunk/ac fix vector is accessed out-of-range");
+        error->all(FLERR,"Fix ave/chunk fix vector is accessed out-of-range");
     } else if (which[i] == VARIABLE) {
       int ivariable = input->variable->find(ids[i]);
       if (ivariable < 0)
-        error->all(FLERR,"Variable name for fix ave/chunk/ac does not exist");
+        error->all(FLERR,"Variable name for fix ave/chunk does not exist");
       if (input->variable->atomstyle(ivariable) == 0)
-        error->all(FLERR,"Fix ave/chunk/ac variable is not atom-style variable");
+        error->all(FLERR,"Fix ave/chunk variable is not atom-style variable");
     }
   }
 
@@ -335,10 +335,10 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
 
   int icompute = modify->find_compute(idchunk);
   if (icompute < 0)
-    error->all(FLERR,"Chunk/atom compute does not exist for fix ave/chunk/ac");
+    error->all(FLERR,"Chunk/atom compute does not exist for fix ave/chunk");
   cchunk = (ComputeChunkAtom *) modify->compute[icompute];
   if (strcmp(cchunk->style,"chunk/atom") != 0)
-    error->all(FLERR,"Fix ave/chunk/ac does not use chunk/atom compute");
+    error->all(FLERR,"Fix ave/chunk does not use chunk/atom compute");
 
   if (nrepeat > 1 || ave == RUNNING || ave == WINDOW) cchunk->lockcount++;
   lockforever = 0;
@@ -435,7 +435,7 @@ FixAveChunkAC::FixAveChunkAC(LAMMPS *lmp, int narg, char **arg) :
 
 /* ---------------------------------------------------------------------- */
 
-FixAveChunkAC::~FixAveChunkAC()
+FixAveChunk::~FixAveChunk()
 {
   delete [] which;
   delete [] argindex;
@@ -491,7 +491,7 @@ FixAveChunkAC::~FixAveChunkAC()
 
 /* ---------------------------------------------------------------------- */
 
-int FixAveChunkAC::setmask()
+int FixAveChunk::setmask()
 {
   int mask = 0;
   mask |= END_OF_STEP;
@@ -500,14 +500,14 @@ int FixAveChunkAC::setmask()
 
 /* ---------------------------------------------------------------------- */
 
-void FixAveChunkAC::init()
+void FixAveChunk::init()
 {
   // set indices and check validity of all computes,fixes,variables
   // check that fix frequency is acceptable
 
   int icompute = modify->find_compute(idchunk);
   if (icompute < 0)
-    error->all(FLERR,"Chunk/atom compute does not exist for fix ave/chunk/ac");
+    error->all(FLERR,"Chunk/atom compute does not exist for fix ave/chunk");
   cchunk = (ComputeChunkAtom *) modify->compute[icompute];
 
   if (biasflag) {
@@ -521,23 +521,23 @@ void FixAveChunkAC::init()
     if (which[m] == COMPUTE) {
       int icompute = modify->find_compute(ids[m]);
       if (icompute < 0)
-        error->all(FLERR,"Compute ID for fix ave/chunk/ac does not exist");
+        error->all(FLERR,"Compute ID for fix ave/chunk does not exist");
       value2index[m] = icompute;
 
     } else if (which[m] == FIX) {
       int ifix = modify->find_fix(ids[m]);
       if (ifix < 0)
-        error->all(FLERR,"Fix ID for fix ave/chunk/ac does not exist");
+        error->all(FLERR,"Fix ID for fix ave/chunk does not exist");
       value2index[m] = ifix;
 
       if (nevery % modify->fix[ifix]->peratom_freq)
         error->all(FLERR,
-                   "Fix for fix ave/chunk/ac not computed at compatible time");
+                   "Fix for fix ave/chunk not computed at compatible time");
 
     } else if (which[m] == VARIABLE) {
       int ivariable = input->variable->find(ids[m]);
       if (ivariable < 0)
-        error->all(FLERR,"Variable name for fix ave/chunk/ac does not exist");
+        error->all(FLERR,"Variable name for fix ave/chunk does not exist");
       value2index[m] = ivariable;
 
     } else value2index[m] = -1;
@@ -560,14 +560,14 @@ void FixAveChunkAC::init()
      that nchunk may not track it
 ------------------------------------------------------------------------- */
 
-void FixAveChunkAC::setup(int vflag)
+void FixAveChunk::setup(int vflag)
 {
   end_of_step();
 }
 
 /* ---------------------------------------------------------------------- */
 
-void FixAveChunkAC::end_of_step()
+void FixAveChunk::end_of_step()
 {
   int i,j,m,n,index;
 
@@ -576,7 +576,7 @@ void FixAveChunkAC::end_of_step()
 
   bigint ntimestep = update->ntimestep;
   if (ntimestep < nvalid_last || ntimestep > nvalid)
-    error->all(FLERR,"Invalid timestep reset for fix ave/chunk/ac");
+    error->all(FLERR,"Invalid timestep reset for fix ave/chunk");
   if (ntimestep != nvalid) return;
   nvalid_last = nvalid;
 
@@ -778,7 +778,7 @@ void FixAveChunkAC::end_of_step()
       if (atom->nmax > maxvar) {
         maxvar = atom->nmax;
         memory->destroy(varatom);
-        memory->create(varatom,maxvar,"ave/chunk/ac:varatom");
+        memory->create(varatom,maxvar,"ave/chunk:varatom");
       }
 
       input->variable->compute_atom(n,igroup,varatom,1,0);
@@ -1067,7 +1067,7 @@ void FixAveChunkAC::end_of_step()
    allocate all per-chunk vectors
 ------------------------------------------------------------------------- */
 
-void FixAveChunkAC::allocate()
+void FixAveChunk::allocate()
 {
   size_array_rows = nchunk;
 
@@ -1075,22 +1075,22 @@ void FixAveChunkAC::allocate()
 
   if (nchunk > maxchunk) {
     maxchunk = nchunk;
-    memory->grow(count_one,nchunk,"ave/chunk/ac:count_one");
-    memory->grow(count_many,nchunk,"ave/chunk/ac:count_many");
-    memory->grow(count_sum,nchunk,"ave/chunk/ac:count_sum");
-    memory->grow(count_total,nchunk,"ave/chunk/ac:count_total");
+    memory->grow(count_one,nchunk,"ave/chunk:count_one");
+    memory->grow(count_many,nchunk,"ave/chunk:count_many");
+    memory->grow(count_sum,nchunk,"ave/chunk:count_sum");
+    memory->grow(count_total,nchunk,"ave/chunk:count_total");
 
-    memory->grow(values_one,nchunk,nvalues,"ave/chunk/ac:values_one");
-    memory->grow(values_many,nchunk,nvalues,"ave/chunk/ac:values_many");
-    memory->grow(values_sum,nchunk,nvalues,"ave/chunk/ac:values_sum");
-    memory->grow(values_total,nchunk,nvalues,"ave/chunk/ac:values_total");
+    memory->grow(values_one,nchunk,nvalues,"ave/chunk:values_one");
+    memory->grow(values_many,nchunk,nvalues,"ave/chunk:values_many");
+    memory->grow(values_sum,nchunk,nvalues,"ave/chunk:values_sum");
+    memory->grow(values_total,nchunk,nvalues,"ave/chunk:values_total");
 
     // only allocate count and values list for ave = WINDOW
 
     if (ave == WINDOW) {
-      memory->create(count_list,nwindow,nchunk,"ave/chunk/ac:count_list");
+      memory->create(count_list,nwindow,nchunk,"ave/chunk:count_list");
       memory->create(values_list,nwindow,nchunk,nvalues,
-                     "ave/chunk/ac:values_list");
+                     "ave/chunk:values_list");
     }
 
     // reinitialize regrown count/values total since they accumulate
@@ -1110,7 +1110,7 @@ void FixAveChunkAC::allocate()
    next column = count, remaining columns = Nvalues
 ------------------------------------------------------------------------- */
 
-double FixAveChunkAC::compute_array(int i, int j)
+double FixAveChunk::compute_array(int i, int j)
 {
   if (values_total == NULL) return 0.0;
   if (i >= nchunk) return 0.0;
@@ -1132,7 +1132,7 @@ double FixAveChunkAC::compute_array(int i, int j)
    else backup from next multiple of nfreq
 ------------------------------------------------------------------------- */
 
-bigint FixAveChunkAC::nextvalid()
+bigint FixAveChunk::nextvalid()
 {
   bigint nvalid = (update->ntimestep/nfreq)*nfreq + nfreq;
   if (nvalid-nfreq == update->ntimestep && nrepeat == 1)
@@ -1147,7 +1147,7 @@ bigint FixAveChunkAC::nextvalid()
    memory usage of varatom and bins
 ------------------------------------------------------------------------- */
 
-double FixAveChunkAC::memory_usage()
+double FixAveChunk::memory_usage()
 {
   double bytes = maxvar * sizeof(double);         // varatom
   bytes += 4*maxchunk * sizeof(double);           // count one,many,sum,total
