@@ -56,6 +56,7 @@ FixAveTime::FixAveTime(LAMMPS *lmp, int narg, char **arg) :
   nevery = force->inumeric(FLERR,arg[3]);
   nrepeat = force->inumeric(FLERR,arg[4]);
   nfreq = force->inumeric(FLERR,arg[5]);
+  append = 0;
 
   global_freq = nfreq;
 

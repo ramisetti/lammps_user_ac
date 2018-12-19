@@ -57,6 +57,7 @@ FixAveChunk::FixAveChunk(LAMMPS *lmp, int narg, char **arg) :
   nevery = force->inumeric(FLERR,arg[3]);
   nrepeat = force->inumeric(FLERR,arg[4]);
   nfreq = force->inumeric(FLERR,arg[5]);
+  append = 0;
 
   int n = strlen(arg[6]) + 1;
   idchunk = new char[n];
